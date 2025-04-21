@@ -1,7 +1,3 @@
-# ansible-roles
-Ansible roles for maintaing AndyWebServices
-
-## License
 Copyright © 2025 Andrew M. Zhang
 
 All rights reserved.
