@@ -1,0 +1,38 @@
+---
+#  Copyright (c) 2025. Andrew M. Zhang All rights reserved.
+#  This work is protected by copyright law and international treaties. No part of this work may be copied, reproduced,
+#  distributed, transmitted, stored in a retrieval system, or translated into any language, in any form or by any means,
+#  without the prior written permission of the copyright holder. Unauthorized use, duplication, or distribution is
+#  strictly prohibited and may result in civil and/or criminal penalties. For inquiries regarding licensing, usage,
+#  or permissions, please open an issue on this repository: https://github.com/AndyWebServices/ansible-roles/issues
+
+- name: Wait for error due to bad config
+  ansible.builtin.shell: |
+    set -o pipefail
+    docker logs {{ config.container_name }} 2>&1 | grep -q "ERROR"
+  register: log_check
+  retries: 30
+  delay: 5
+  until: log_check.rc == 0
+  changed_when: log_check.rc != 0
+
+- name: Pause for 10 seconds
+  ansible.builtin.pause:
+    seconds: 10
+
+- name: Stop docker
+  community.docker.docker_compose_v2:
+    project_src: "{{ swag_docker_remote_repo_path }}/composes/{{ config.container_name }}-docker"
+    state: absent
+
+- name: If dnsplugin is cloudflare, override cloudflare.ini
+  ansible.builtin.template:
+    src: cloudflare.ini.j2
+    dest: "{{ swag_docker_remote_repo_path }}/composes/{{ config.container_name }}-docker/config/dns-conf/cloudflare.ini"
+    mode: '0644'
+  when: dnsplugin is defined and dnsplugin == "cloudflare"
+
+- name: Restart Docker Compose project
+  community.docker.docker_compose_v2:
+    project_src: "{{ swag_docker_remote_repo_path }}/composes/{{ config.container_name }}-docker"
+    state: present

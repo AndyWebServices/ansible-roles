@@ -1,0 +1,34 @@
+services:
+  swag:
+    image: lscr.io/linuxserver/swag:latest
+    container_name: swag-aws
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=America/Chicago
+      - URL=example.com
+      - VALIDATION=dns
+      - SUBDOMAINS=pihole #optional
+      - CERTPROVIDER=zerossl #optional
+      - DNSPLUGIN=cloudflare #optional
+      - PROPAGATION= #optional
+      - EMAIL=user@example.com #optional
+      - ONLY_SUBDOMAINS=true #optional
+      - EXTRA_DOMAINS= #optional
+      - STAGING=false #optional
+      - DISABLE_F2B= #optional
+      - SWAG_AUTORELOAD=true #optional
+      - SWAG_AUTORELOAD_WATCHLIST= #optional
+    volumes:
+      - ./config:/config
+    ports:
+      - 0.0.0.0:80:80
+      - 0.0.0.0:443:443
+    restart: unless-stopped
+
+networks:
+  default:
+    name: lsio-aws
+    external: true

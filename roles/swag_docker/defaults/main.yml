@@ -1,0 +1,13 @@
+---
+swag_docker_container_name: swag
+swag_docker_tz: "{{ tz | 'UTC' }}"
+swag_docker_validation: "{{ validation | '' }}"
+swag_docker_subdomains: "{{ subdomains | [] }}"
+swag_docker_certprovider: "{{ certprovider | '' }}"
+swag_docker_dnsplugin: "{{ dnsplugin | '' }}"
+swag_docker_email: "{{ email | '' }}"
+swag_docker_only_subdomains: "{{ only_subdomains | false }}"
+swag_docker_extra_domains: "{{ extra_domains | [] }}"
+swag_docker_ports: "{{ ports | [] }}"
+swag_docker_docker_network: "{{ docker_network | '' }}"
+swag_docker_check_docker: "{{ check_docker | true }}"

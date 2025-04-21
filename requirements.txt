@@ -1,0 +1,5 @@
+ansible~=11.4
+ansible-dev-tools~=25.4
+docker~=7.1
+molecule-plugins[docker]~=23.7
+pytest-ansible~=25.4
