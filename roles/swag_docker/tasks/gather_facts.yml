@@ -20,5 +20,5 @@
 
 - name: Set UID and GID facts for ansible user
   ansible.builtin.set_fact:
-    user_uid: "{{ passwd_entry.ansible_facts.getent_passwd[ansible_user][1] }}"
-    user_gid: "{{ passwd_entry.ansible_facts.getent_passwd[ansible_user][2] }}"
+    swag_docker_user_uid: "{{ passwd_entry.ansible_facts.getent_passwd[ansible_user][1] }}"
+    swag_docker_user_gid: "{{ passwd_entry.ansible_facts.getent_passwd[ansible_user][2] }}"

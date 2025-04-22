@@ -15,7 +15,7 @@
       container_name: "{{ swag_docker_container_name }}"
       user_uid: "{{ swag_docker_user_uid }}"
       user_gid: "{{ swag_docker_user_gid }}"
-      swag_docker_tz: "{{ swag_docker_swag_docker_tz }}"
+      swag_docker_tz: "{{ swag_docker_tz }}"
       url: "{{ swag_docker_url }}"
       validation: "{{ swag_docker_validation }}"
       subdomains: "{{ swag_docker_subdomains }}"
@@ -45,7 +45,7 @@
 - name: Handle compose cleanup and directory prep
   ansible.builtin.include_tasks: compose_cleanup.yml
 - name: Stop docker compose, if running
-  when: start_container
+  when: swag_docker_start_container
   community.docker.docker_compose_v2:
     state: absent
     project_src: "{{ swag_docker_remote_repo_path }}/composes/{{ _config.container_name }}-docker"
