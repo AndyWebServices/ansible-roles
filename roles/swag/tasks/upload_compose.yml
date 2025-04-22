@@ -1,0 +1,62 @@
+---
+#  Copyright (c) 2025. Andrew M. Zhang All rights reserved.
+#  This work is protected by copyright law and international treaties. No part of this work may be copied, reproduced,
+#  distributed, transmitted, stored in a retrieval system, or translated into any language, in any form or by any means,
+#  without the prior written permission of the copyright holder. Unauthorized use, duplication, or distribution is
+#  strictly prohibited and may result in civil and/or criminal penalties. For inquiries regarding licensing, usage,
+#  or permissions, please open an issue on this repository: https://github.com/AndyWebServices/ansible-roles/issues
+
+# Prepare docker-compose.yml template
+
+# Create final _config
+- name: Create _config
+  ansible.builtin.set_fact:
+    _config:
+      container_name: "{{ swag_container_name }}"
+      user_uid: "{{ swag_user_uid }}"
+      user_gid: "{{ swag_user_gid }}"
+      swag_tz: "{{ swag_tz }}"
+      url: "{{ swag_url }}"
+      validation: "{{ swag_validation }}"
+      subdomains: "{{ swag_subdomains }}"
+      certprovider: "{{ swag_certprovider }}"
+      dnsplugin: "{{ swag_dnsplugin }}"
+      email: "{{ swag_email }}"
+      only_subdomains: "{{ swag_only_subdomains }}"
+      extra_domains: "{{ swag_extra_domains }}"
+      ports: "{{ swag_ports }}"
+      docker_network: "{{ swag_network }}"
+
+# Debug config
+- name: Print the _config dict
+  ansible.builtin.debug:
+    var: _config
+  when: debug_mode is defined and debug_mode
+
+# Check that the template can be generated correctly
+- name: Validate rendering of docker-compose.yml template
+  vars:
+    rendered_template: "{{ lookup('template', 'docker-compose.yml.j2') }}"
+  ansible.builtin.debug:
+    msg: "Template rendered successfully."
+
+- name: Set up Docker network
+  ansible.builtin.include_tasks: docker_setup.yml
+- name: Handle compose cleanup and directory prep
+  ansible.builtin.include_tasks: compose_cleanup.yml
+- name: Stop docker compose, if running
+  when: swag_start_container
+  community.docker.docker_compose_v2:
+    state: absent
+    project_src: "{{ swag_remote_repo_path }}/composes/{{ _config.container_name }}-docker"
+
+- name: See if config directory exists
+  ansible.builtin.stat:
+    path: "{{ swag_remote_repo_path }}/composes/{{ _config.container_name }}-docker/config"
+  register: config_dir_stat
+
+- name: Upload rendered swag docker-compose.yml to remote host
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ swag_remote_repo_path }}/composes/{{ _config.container_name }}-docker/docker-compose.yml"
+    mode: '0644'

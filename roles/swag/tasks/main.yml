@@ -1,0 +1,36 @@
+---
+#  Copyright (c) 2025. Andrew M. Zhang. All rights reserved.
+#  This work is protected by copyright law and international treaties. No part of this work may be copied, reproduced,
+#  distributed, transmitted, stored in a retrieval system, or translated into any language, in any form or by any means,
+#  without the prior written permission of the copyright holder. Unauthorized use, duplication, or distribution is
+#  strictly prohibited and may result in civil and/or criminal penalties. For inquiries regarding licensing, usage,
+#  or permissions, please open an issue on this repository: https://github.com/AndyWebServices/ansible-roles/issues
+
+- name: Gather network and user facts
+  ansible.builtin.include_tasks: gather_facts.yml
+
+- name: Upload newly generated docker-compose.yml
+  ansible.builtin.include_tasks: upload_compose.yml
+
+- name: Start docker compose
+  when: swag_start_container
+  community.docker.docker_compose_v2:
+    state: present
+    project_src: "{{ swag_remote_repo_path }}/composes/{{ container_name }}-docker"
+
+- name: DNS validation
+  ansible.builtin.include_tasks: validation_dns.yml
+  when: swag_start_container and validation is defined and validation == "dns"
+
+- name: Wait for init for http-based validation
+  when: swag_start_container and (validation is not defined or validation == "http")
+  block:
+    - name: Wait for server ready
+      ansible.builtin.shell: |
+        set -o pipefail
+        docker logs {{ container_name }} 2>&1 | grep -q "Server Ready"
+      register: log_check
+      retries: 30
+      delay: 2
+      until: log_check.rc == 0
+      changed_when: log_check.rc != 0

@@ -1,0 +1,35 @@
+services:
+  swag:
+    image: lscr.io/linuxserver/swag:latest
+    container_name: {{ _config.container_name }}
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID={{ _config.user_uid }}
+      - PGID={{ _config.user_gid }}
+      - TZ={{ _config.swag_tz }}
+      - URL={{ _config.url }}
+      - VALIDATION={{ _config.validation }}
+      - SUBDOMAINS={{ _config.subdomains | join(', ') }} #optional
+      - CERTPROVIDER={{ _config.certprovider }} #optional
+      - DNSPLUGIN={{ _config.dnsplugin }} #optional
+      - PROPAGATION= #optional
+      - EMAIL={{ _config.email }} #optional
+      - ONLY_SUBDOMAINS={{ _config.only_subdomains | string | lower }} #optional
+      - EXTRA_DOMAINS={{ _config.extra_domains | join(', ') }} #optional
+      - STAGING=false #optional
+      - DISABLE_F2B= #optional
+      - SWAG_AUTORELOAD=true #optional
+      - SWAG_AUTORELOAD_WATCHLIST= #optional
+    volumes:
+      - ./config:/config
+    ports:
+{% for port in _config.ports %}
+      - {{ port }}
+{% endfor %}
+    restart: unless-stopped
+
+networks:
+  default:
+    name: {{ _config.docker_network }}
+    external: true

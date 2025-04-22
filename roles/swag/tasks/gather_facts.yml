@@ -1,0 +1,24 @@
+---
+#  Copyright (c) 2025. Andrew M. Zhang All rights reserved.
+#  This work is protected by copyright law and international treaties. No part of this work may be copied, reproduced,
+#  distributed, transmitted, stored in a retrieval system, or translated into any language, in any form or by any means,
+#  without the prior written permission of the copyright holder. Unauthorized use, duplication, or distribution is
+#  strictly prohibited and may result in civil and/or criminal penalties. For inquiries regarding licensing, usage,
+#  or permissions, please open an issue on this repository: https://github.com/AndyWebServices/ansible-roles/issues
+
+# Gather information on the remote host
+- name: Gather network facts
+  ansible.builtin.setup:
+    gather_subset:
+      - network
+
+- name: Get UID and GID of user
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ ansible_user }}"
+  register: passwd_entry
+
+- name: Set UID and GID facts for ansible user
+  ansible.builtin.set_fact:
+    swag_user_uid: "{{ passwd_entry.ansible_facts.getent_passwd[ansible_user][1] }}"
+    swag_user_gid: "{{ passwd_entry.ansible_facts.getent_passwd[ansible_user][2] }}"

@@ -1,0 +1,23 @@
+---
+- name: Verify docker-compose.yml
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Copy file from container to controller
+      ansible.builtin.fetch:
+        src: ~/aws-infra/composes/swag-aws-docker/docker-compose.yml # the file inside the container
+        dest: /tmp/ # local dir (will create subdirs with inventory hostname)
+        flat: true
+
+    - name: Compare file with reference
+      ansible.builtin.command: "diff /tmp/docker-compose.yml $MOLECULE_PROJECT_DIRECTORY/molecule/default/docker-compose.yml.expected"
+      delegate_to: localhost
+      register: diff_result
+      ignore_errors: true
+      changed_when: diff_result.rc != 0
+      failed_when: diff_result.rc > 1
+
+    - name: Show the diff
+      ansible.builtin.debug:
+        msg: "{{ diff_result.stdout_lines }}"
+      when: diff_result.rc == 1
