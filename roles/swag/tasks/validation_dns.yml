@@ -22,17 +22,17 @@
 
 - name: Stop docker
   community.docker.docker_compose_v2:
-    project_src: "{{ swag_docker_remote_repo_path }}/composes/{{ config.container_name }}-docker"
+    project_src: "{{ swag_remote_repo_path }}/composes/{{ config.container_name }}-docker"
     state: absent
 
 - name: If dnsplugin is cloudflare, override cloudflare.ini
   ansible.builtin.template:
     src: cloudflare.ini.j2
-    dest: "{{ swag_docker_remote_repo_path }}/composes/{{ config.container_name }}-docker/config/dns-conf/cloudflare.ini"
+    dest: "{{ swag_remote_repo_path }}/composes/{{ config.container_name }}-docker/config/dns-conf/cloudflare.ini"
     mode: '0644'
   when: dnsplugin is defined and dnsplugin == "cloudflare"
 
 - name: Restart Docker Compose project
   community.docker.docker_compose_v2:
-    project_src: "{{ swag_docker_remote_repo_path }}/composes/{{ config.container_name }}-docker"
+    project_src: "{{ swag_remote_repo_path }}/composes/{{ config.container_name }}-docker"
     state: present

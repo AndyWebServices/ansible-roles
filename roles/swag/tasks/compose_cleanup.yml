@@ -6,19 +6,8 @@
 #  strictly prohibited and may result in civil and/or criminal penalties. For inquiries regarding licensing, usage,
 #  or permissions, please open an issue on this repository: https://github.com/AndyWebServices/ansible-roles/issues
 
-# Gather information on the remote host
-- name: Gather network facts
-  ansible.builtin.setup:
-    gather_subset:
-      - network
-
-- name: Get UID and GID of user
-  ansible.builtin.getent:
-    database: passwd
-    key: "{{ ansible_user }}"
-  register: passwd_entry
-
-- name: Set UID and GID facts for ansible user
-  ansible.builtin.set_fact:
-    swag_docker_user_uid: "{{ passwd_entry.ansible_facts.getent_passwd[ansible_user][1] }}"
-    swag_docker_user_gid: "{{ passwd_entry.ansible_facts.getent_passwd[ansible_user][2] }}"
+- name: Ensure remote docker-compose directory exists
+  ansible.builtin.file:
+    path: "{{ swag_remote_repo_path }}/composes/{{ _config.container_name }}-docker"
+    state: directory
+    mode: '0755'

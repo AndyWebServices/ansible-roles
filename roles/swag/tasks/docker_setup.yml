@@ -9,11 +9,11 @@
 - name: Check or install docker
   ansible.builtin.include_role:
     name: geerlingguy.docker
-  when: swag_docker_check_docker is defined and swag_docker_check_docker
+  when: swag_check_docker is defined and swag_check_docker
 
 - name: Ensure Docker network 'lsio' exists
   community.docker.docker_network:
     name: "{{ config.docker_network }}"
     driver: bridge
     state: present
-  when: swag_docker_check_docker is defined and swag_docker_check_docker
+  when: swag_check_docker is defined and swag_check_docker

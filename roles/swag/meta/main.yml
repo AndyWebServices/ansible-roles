@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  role_name: swag_docker
+  role_name: swag
   namespace: andywebservices
   author: AndyWebServices
   description: Setups linuxserver.io's Swag docker container

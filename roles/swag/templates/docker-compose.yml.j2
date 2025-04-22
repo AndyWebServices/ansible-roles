@@ -7,7 +7,7 @@ services:
     environment:
       - PUID={{ _config.user_uid }}
       - PGID={{ _config.user_gid }}
-      - TZ={{ _config.swag_docker_tz }}
+      - TZ={{ _config.swag_tz }}
       - URL={{ _config.url }}
       - VALIDATION={{ _config.validation }}
       - SUBDOMAINS={{ _config.subdomains | join(', ') }} #optional

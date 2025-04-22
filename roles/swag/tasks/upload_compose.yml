@@ -12,20 +12,20 @@
 - name: Create _config
   ansible.builtin.set_fact:
     _config:
-      container_name: "{{ swag_docker_container_name }}"
-      user_uid: "{{ swag_docker_user_uid }}"
-      user_gid: "{{ swag_docker_user_gid }}"
-      swag_docker_tz: "{{ swag_docker_tz }}"
-      url: "{{ swag_docker_url }}"
-      validation: "{{ swag_docker_validation }}"
-      subdomains: "{{ swag_docker_subdomains }}"
-      certprovider: "{{ swag_docker_certprovider }}"
-      dnsplugin: "{{ swag_docker_dnsplugin }}"
-      email: "{{ swag_docker_email }}"
-      only_subdomains: "{{ swag_docker_only_subdomains }}"
-      extra_domains: "{{ swag_docker_extra_domains }}"
-      ports: "{{ swag_docker_ports }}"
-      docker_network: "{{ swag_docker_docker_network }}"
+      container_name: "{{ swag_container_name }}"
+      user_uid: "{{ swag_user_uid }}"
+      user_gid: "{{ swag_user_gid }}"
+      swag_tz: "{{ swag_tz }}"
+      url: "{{ swag_url }}"
+      validation: "{{ swag_validation }}"
+      subdomains: "{{ swag_subdomains }}"
+      certprovider: "{{ swag_certprovider }}"
+      dnsplugin: "{{ swag_dnsplugin }}"
+      email: "{{ swag_email }}"
+      only_subdomains: "{{ swag_only_subdomains }}"
+      extra_domains: "{{ swag_extra_domains }}"
+      ports: "{{ swag_ports }}"
+      docker_network: "{{ swag_network }}"
 
 # Debug config
 - name: Print the _config dict
@@ -45,18 +45,18 @@
 - name: Handle compose cleanup and directory prep
   ansible.builtin.include_tasks: compose_cleanup.yml
 - name: Stop docker compose, if running
-  when: swag_docker_start_container
+  when: swag_start_container
   community.docker.docker_compose_v2:
     state: absent
-    project_src: "{{ swag_docker_remote_repo_path }}/composes/{{ _config.container_name }}-docker"
+    project_src: "{{ swag_remote_repo_path }}/composes/{{ _config.container_name }}-docker"
 
 - name: See if config directory exists
   ansible.builtin.stat:
-    path: "{{ swag_docker_remote_repo_path }}/composes/{{ _config.container_name }}-docker/config"
+    path: "{{ swag_remote_repo_path }}/composes/{{ _config.container_name }}-docker/config"
   register: config_dir_stat
 
 - name: Upload rendered swag docker-compose.yml to remote host
   ansible.builtin.template:
     src: docker-compose.yml.j2
-    dest: "{{ swag_docker_remote_repo_path }}/composes/{{ _config.container_name }}-docker/docker-compose.yml"
+    dest: "{{ swag_remote_repo_path }}/composes/{{ _config.container_name }}-docker/docker-compose.yml"
     mode: '0644'

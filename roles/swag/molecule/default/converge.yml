@@ -1,0 +1,40 @@
+---
+- name: Generate docker-compose.yml on docker remote host
+  hosts: all
+
+  pre_tasks:
+    - name: Update apt cache.
+      ansible.builtin.apt:
+        update_cache: "yes"
+        cache_valid_time: "600"
+      when: ansible_os_family == 'Debian'
+
+  tasks:
+    - name: Install python-docker
+      ansible.builtin.include_role:
+        name: geerlingguy.pip
+
+    - name: Create swag-aws-docker for network lsio-aws
+      ansible.builtin.include_role:
+        name: swag
+      vars:
+        ansible_user: root
+
+        swag_remote_repo_path: ~/aws-infra
+        swag_purge_config_dir: false
+        swag_start_container: false
+        swag_tz: America/Chicago
+        swag_email: user@example.com
+        swag_url: example.com
+        swag_container_name: swag-aws
+        swag_network: lsio-aws
+        swag_check_docker: false
+        swag_validation: dns
+        swag_dnsplugin: cloudflare
+        swag_certprovider: zerossl
+        swag_only_subdomains: "true"
+        swag_subdomains:
+          - pihole
+        swag_ports:
+          - "0.0.0.0:80:80"
+          - "0.0.0.0:443:443"
